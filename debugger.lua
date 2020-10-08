@@ -157,3 +157,22 @@ end)()
 -- Debug overlay, triggered by pressing `
 -- From: https://www.lexaloffle.com/bbs/?tid=33099
 dbg_dbtn = '`' dbt = 7 don = false cc = 8 mc = 15 addr = 0x5e00 function dtxt(txt,x,y,c) print(txt, x,y+1,1) print(txt,x,y,c) end function init_dbg() poke(0x5f2d, 1) test_num = peek(∧addr) or 0 poke(∧addr, test_num+1) end dbtm = 0 dbu = {0,0,0} function sdbg() if stat(31) == dbg_dbtn then if don==false then don=true else don=false end end if don != true then return end local c=dbt local cpu=stat(1)*100 local mem=(stat(0)/100)/10*32 local fps=stat(7) local u=stat(7)..'' local _x=124-(#u*4) local du = {dbu[1],dbu[2],dbu[3]} dtxt(u, 124-(#u*4), 1, c) u=cpu..'%' dtxt(u, 124-(#u*4), 7, c) u=mem..'kb /' dtxt(u, 124-(#u*4)-32, 13, c) dtxt('31.25kib', 128-33, 13, c) dtxt(du[3]..'h', 124-44, 128-9, c) dtxt(du[2]..'m', 124-28, 128-9, c) dtxt(du[1] ..'s', 124-12, 128-9, c) dtxt('cpu', 1, 7, c) dtxt('mem', 1, 13, c) dtxt('pico-'..stat(5), 1, 128-15, c) dtxt('uptime', 1, 128-9, c) dbtm+=1 dbu[1] = flr(dbtm/stat(8)) dbu[2] = flr(dbu[1]/60) dbu[3] = flr(dbu[2]/60) dtxt('test number: '..peek(0x5e00), 0, 24, c) dtxt('mouse: {'..stat(32)..','..stat(33)..'}\nbitmask: '..stat(34), 0, 30, c) draw_dbg_info(c) end function draw_dbg_info(c) local m = {stat(32)/8, stat(33)/8} local tile=fget(mget(m[0],m[1]), 0) dtxt('tile flags', 0, 6*8, c) local res = {} res[1] = fget(mget(m[1],m[2]), 0) res[2] = fget(mget(m[1],m[2]), 1) res[3] = fget(mget(m[1],m[2]), 2) res[4] = fget(mget(m[1],m[2]), 3) res[5] = fget(mget(m[1],m[2]), 4) res[6] = fget(mget(m[1],m[2]), 5) res[7] = fget(mget(m[1],m[2]), 6) res[8] = fget(mget(m[1],m[2]), 7) dtxt('{'.. blton(res[1]) ..','..blton(res[2]) ..','..blton(res[3]) ..','..blton(res[4]) ..'\n '..blton(res[5]) ..','..blton(res[6]) ..','..blton(res[7]) ..','..blton(res[8]) ..'}\ntile-id: '..mget(m[1],m[2]), 0, 6*9, c) print('color: '..pget(m[1]*8,m[2]*8), 0, 6*12, max(pget(m[1]*8,m[2]*8), 1)) circ(stat(32), stat(33), 3, c) circfill(stat(32), stat(33),1, c) end function blton(v) return v and 1 or 0 end
+
+function tableToString(table, pretty, indent)
+  indent = indent or ''
+  local nextIndent = indent..'  '
+  local newline = '\n'
+  if (not pretty) then
+    nextIndent = ''
+    newline = ''
+  end
+  local str = "{"
+  for key, value in pairs(table) do
+    str = str..newline..nextIndent.."["..key.."]="..(type(value) == "table" and tableToString(value, pretty, nextIndent) or value)
+  end
+  return str..newline..indent.."}"
+end
+
+function printTable(table, pretty)
+  printh(tableToString(table, pretty))
+end
