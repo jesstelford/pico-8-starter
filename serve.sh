@@ -1,2 +1,2 @@
 #!/bin/sh
-npx reload@^3.1.1 --dir=export -b
+npx --yes reload@^3.2.0 --dir=export -b
