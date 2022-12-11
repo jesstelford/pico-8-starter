@@ -1,3 +1,5 @@
+-- vim: set filetype=pico8:
+
 -- From https://www.lexaloffle.com/bbs/?tid=37822
 debugger=(function()
 
